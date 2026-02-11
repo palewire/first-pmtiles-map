@@ -19,7 +19,8 @@
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol('pmtiles', protocol.tile);
 
-    const stormsHttpUrl = `${window.location.origin}/ibtracs.pmtiles`;
+    // Use a relative URL so it works on GitHub Pages subpaths
+    const stormsHttpUrl = new URL('ibtracs.pmtiles', window.location.href).href;
     const stormsTilesUrl = `pmtiles://${stormsHttpUrl}`;
     protocol.add(new pmtiles.PMTiles(stormsHttpUrl));
 
@@ -38,8 +39,6 @@
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
 
     map.on('load', () => {
-      map.setProjection({ type: 'globe' });
-
       map.addSource('storms', { type: 'vector', url: stormsTilesUrl });
 
       const firstSymbolLayerId = map.getStyle().layers.find((layer) => layer.type === 'symbol')?.id;
