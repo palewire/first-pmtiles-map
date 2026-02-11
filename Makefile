@@ -1,119 +1,113 @@
-# Mark all the commands that don't have a target
-.PHONY: help test lint fix format install type-check build clean build-docs serve-docs
-.DEFAULT_GOAL := help
-
+# Makefile: Download NOAA IBTrACS tropical cyclone tracks and convert to PMTiles
 #
-# Colors
+# Prerequisites:
+#   - curl
+#   - unzip
+#   - ogr2ogr (from GDAL, e.g., `brew install gdal` or `apt install gdal-bin`)
+#   - tippecanoe (https://github.com/felt/tippecanoe)
+#   - node/npx (for the local preview server)
 #
+# Usage:
+#   make                     # Downloads since-1980 track lines, builds PMTiles
+#   make SUBSET=NA           # North Atlantic only
+#   make SUBSET=ALL          # All basins, entire record
+#   make SUBSET=last3years   # Recent storms only
+#   make GEOMETRY=points     # Use point geometries instead of lines
+#   make site                # Build site/ with index.html, style.json, ibtracs.pmtiles
+#   make serve               # Build site/ and serve it on localhost
+#   make clean               # Remove intermediates and the site directory
+#   make clobber             # Remove everything including final PMTiles
 
-# Define ANSI color codes
-RESET_COLOR   = \033[m
+# ---------- Configuration ----------
 
-BLUE       = \033[1;34m
-YELLOW     = \033[1;33m
-GREEN      = \033[1;32m
-RED        = \033[1;31m
-BLACK      = \033[1;30m
-MAGENTA    = \033[1;35m
-CYAN       = \033[1;36m
-WHITE      = \033[1;37m
+# IBTrACS version
+VERSION := v04r01
 
-DBLUE      = \033[0;34m
-DYELLOW    = \033[0;33m
-DGREEN     = \033[0;32m
-DRED       = \033[0;31m
-DBLACK     = \033[0;30m
-DMAGENTA   = \033[0;35m
-DCYAN      = \033[0;36m
-DWHITE     = \033[0;37m
+# Choose a subset: ALL, since1980, last3years, NA, EP, WP, SI, SP, NI, SA
+SUBSET   ?= since1980
 
-BG_WHITE   = \033[47m
-BG_RED     = \033[41m
-BG_GREEN   = \033[42m
-BG_YELLOW  = \033[43m
-BG_BLUE    = \033[44m
-BG_MAGENTA = \033[45m
-BG_CYAN    = \033[46m
+# Geometry type: lines or points
+GEOMETRY ?= lines
 
-# Name some of the colors
-COM_COLOR   = $(DBLUE)
-OBJ_COLOR   = $(DCYAN)
-OK_COLOR    = $(DGREEN)
-ERROR_COLOR = $(DRED)
-WARN_COLOR  = $(DYELLOW)
-NO_COLOR    = $(RESET_COLOR)
+SITE_DIR   ?= site
+SRC_DIR    ?= src
+HTML_FILE  ?= $(SRC_DIR)/index.html
+SITE_PORT  ?= 8000
+SRC_READY  := $(SRC_DIR)/.ready
+SITE_READY := $(SITE_DIR)/.ready
 
-OK_STRING    = "[OK]"
-ERROR_STRING = "[ERROR]"
-WARN_STRING  = "[WARNING]"
+# Tippecanoe settings
+MIN_ZOOM   := 0
+MAX_ZOOM   := 10
+LAYER_NAME := storms
 
-define banner
-    @echo "  $(WHITE)__________$(RESET_COLOR)"
-    @echo "$(WHITE) |$(DWHITE) PALEWIRE $(RESET_COLOR)$(WHITE)|$(RESET_COLOR)"
-    @echo "$(WHITE) |&&& ======|$(RESET_COLOR)"
-    @echo "$(WHITE) |=== ======|$(RESET_COLOR)  $(DWHITE)This is a $(RESET_COLOR)$(DBLACK)$(BG_WHITE)palewire$(RESET_COLOR)$(DWHITE) automation$(RESET_COLOR)"
-    @echo "$(WHITE) |=== == %%%|$(RESET_COLOR)"
-    @echo "$(WHITE) |[_] ======|$(RESET_COLOR)  $(1)"
-    @echo "$(WHITE) |=== ===!##|$(RESET_COLOR)"
-    @echo "$(WHITE) |__________|$(RESET_COLOR)"
-    @echo ""
-endef
+# ---------- Derived variables ----------
 
-#
-# Python helpers
-#
+BASENAME := $(SRC_DIR)/IBTrACS.$(SUBSET).list.$(VERSION).$(GEOMETRY)
+ZIP_FILE := $(BASENAME).zip
+SHP_FILE := $(BASENAME).shp
+GEOJSON  := $(BASENAME).geojson
+PMTILES  := $(SRC_DIR)/ibtracs.pmtiles
 
-UV := uv run
-PYTHON := python -W ignore -m
+BASE_URL := https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/$(VERSION)/access/shapefile
 
-#
-# Commands
-#
+# ---------- Targets ----------
 
-help: ## Show this help. Example: make help
-	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+.PHONY: all clean clobber site serve
 
-install: ## Install dependencies with uv
-	$(call banner,  ⚙️  Installing dependencies ⚙️ )
-	uv sync --all-extras
+all: $(PMTILES)
 
-test: ## Run tests with coverage
-	$(call banner,  🧪 Running tests 🧪)
-	uv run pytest --cov -sv
+site: $(PMTILES) $(HTML_FILE) | $(SITE_READY)
+	cp $(HTML_FILE) $(PMTILES) $(SITE_DIR)/
 
-lint: ## Check code with ruff
-	$(call banner,  🛡️  Linting code 🛡️ )
-	uv run ruff check
+serve:
+	npx --yes serve --listen $(SITE_PORT) $(SRC_DIR)
 
-format: ## Format code with ruff
-	$(call banner,  🎨 Formatting code 🎨 )
-	uv run ruff format
+# Step 1: Download the shapefile zip from NOAA
+$(ZIP_FILE): | $(SRC_READY)
+	curl -L -o $@ "$(BASE_URL)/$(notdir $(ZIP_FILE))"
 
-fix: ## Auto-fix linting issues
-	$(call banner,  🔧 Auto-fixing issues 🔧)
-	@uv run ruff check --fix
+# Step 2: Unzip (produces .shp, .dbf, .shx, .prj)
+$(SHP_FILE): $(ZIP_FILE)
+	unzip -o $< -d $(SRC_DIR)
+	touch $@
 
-type-check: ## Verify static typing with ty
-	$(call banner,  🔍 Verifying static typing 🔍)
-	uv run ty check
+# Step 3: Convert shapefile to GeoJSON with ogr2ogr
+#   - Reproject to WGS84 (defensive)
+#   - Keep columns commonly used for quick mapping
+$(GEOJSON): $(SHP_FILE)
+	ogr2ogr -f GeoJSON \
+		-t_srs EPSG:4326 \
+		-select "SID,SEASON,NAME,ISO_TIME,NATURE,WMO_WIND,WMO_PRES,USA_WIND,USA_PRES,USA_SSHS,BASIN,SUBBASIN,DIST2LAND,LANDFALL,STORM_SPD" \
+		$@ $(SHP_FILE)
 
-build: ## Build distribution packages
-	$(call banner,  📦 Building distribution packages 📦)
-	uv build --sdist --wheel
+# Step 4: Build PMTiles with tippecanoe
+$(PMTILES): $(GEOJSON)
+	tippecanoe \
+		-o $@ \
+		--name="NOAA IBTrACS $(SUBSET) $(GEOMETRY)" \
+		--description="Global tropical cyclone tracks from IBTrACS $(VERSION)" \
+		--attribution="NOAA NCEI IBTrACS" \
+		--layer=$(LAYER_NAME) \
+		--minimum-zoom=$(MIN_ZOOM) \
+		--maximum-zoom=$(MAX_ZOOM) \
+		--drop-densest-as-needed \
+		--extend-zooms-if-still-dropping \
+		--force \
+		$(GEOJSON)
 
-clean: ## Remove build artifacts
-	$(call banner,  🧹 Cleaning build artifacts 🧹)
-	rm -rf dist/ build/ *.egg-info .pytest_cache .ruff_cache
-	find . -type d -name __pycache__ -exec rm -rf {} +
+clean:
+	rm -f $(ZIP_FILE) $(SHP_FILE) $(BASENAME).dbf $(BASENAME).shx $(BASENAME).prj $(BASENAME).cpg $(GEOJSON)
+	rm -rf $(SITE_DIR)
+	rm -f $(SRC_READY) $(SITE_READY)
 
-build-docs: ## Build the docs
-	$(call banner,  📚 Building docs 📚)
-	@rm -rf _build/
-	@rm -rf docs/_build
-	@cd docs && $(UV) make html
+clobber: clean
+	rm -f $(PMTILES)
 
-serve-docs: ## Test the site
-	$(call banner,  🧪 Serving test site 🧪)
-	@rm -rf _build/
-	@rm -rf docs/_build
-	@cd docs && $(UV) make livehtml
+$(SRC_READY):
+	mkdir -p $(SRC_DIR)
+	touch $@
+
+$(SITE_READY):
+	mkdir -p $(SITE_DIR)
+	touch $@

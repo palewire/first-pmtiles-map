@@ -1,3 +1,13 @@
+# Downloaded files
+src/*.geojson
+src/*.dbf
+src/*.shp
+src/*.shx
+src/*.prj
+src/*.zip
+src/*.pmtiles
+src/*.tmp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

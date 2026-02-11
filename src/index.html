@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBTrACS PMTiles Map</title>
+  <script src="https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/pmtiles@3/dist/pmtiles.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+    #map { position: absolute; inset: 0; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    // Register PMTiles protocol so the vector source can load .pmtiles directly
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+
+    const stormsHttpUrl = `${window.location.origin}/ibtracs.pmtiles`;
+    const stormsTilesUrl = `pmtiles://${stormsHttpUrl}`;
+    protocol.add(new pmtiles.PMTiles(stormsHttpUrl));
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://tiles.openfreemap.org/styles/liberty',
+      center: [0, 15],
+      zoom: 2,
+      minZoom: 1,
+      maxZoom: 10,
+      attributionControl: false,
+      hash: true
+    });
+
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+
+    map.on('load', () => {
+      map.setProjection({ type: 'globe' });
+
+      map.addSource('storms', { type: 'vector', url: stormsTilesUrl });
+
+      const firstSymbolLayerId = map.getStyle().layers.find((layer) => layer.type === 'symbol')?.id;
+
+      map.addLayer({
+        id: 'storms-line',
+        type: 'line',
+        source: 'storms',
+        'source-layer': 'storms',
+        paint: {
+          'line-color': [
+            'interpolate', ['linear'], ['coalesce', ['get', 'USA_SSHS'], -1],
+            -1, '#7aa6c7',
+            0, '#4dc9ff',
+            1, '#8bc34a',
+            2, '#ffd166',
+            3, '#f4a261',
+            4, '#e76f51',
+            5, '#c71f37'
+          ],
+          'line-width': [
+            'interpolate', ['linear'], ['coalesce', ['get', 'USA_WIND'], 0],
+            0, 0.8,
+            50, 2,
+            100, 3.5,
+            150, 5
+          ],
+          'line-opacity': 0.9
+        }
+      }, firstSymbolLayerId);
+
+    });
+  </script>
+</body>
+</html>

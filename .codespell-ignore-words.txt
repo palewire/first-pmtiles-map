@@ -1,4 +1,4 @@
-# Python terms
+ibtracs
 pytest
 codespell
 sphinxcontrib
