@@ -27,7 +27,7 @@ src/ibtracs.pmtiles: $(NAME).geojson
 	tippecanoe -o $@ \
 		--layer=storms \
 		--minimum-zoom=0 \
-		--maximum-zoom=10 \
+		--maximum-zoom=4 \
 		--no-feature-limit \
 		--no-tile-size-limit \
 		$(NAME).geojson
