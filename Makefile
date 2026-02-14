@@ -1,7 +1,7 @@
 NAME := src/IBTrACS.since1980.list.v04r01.lines
 URL  := https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/shapefile/IBTrACS.since1980.list.v04r01.lines.zip
 
-.PHONY: all serve clean clobber
+.PHONY: all serve clean clobber upload
 
 all: src/ibtracs.pmtiles
 
@@ -13,6 +13,9 @@ clean:
 
 clobber: clean
 	rm -f src/ibtracs.pmtiles
+
+upload: src/ibtracs.pmtiles
+	aws s3 --profile palewire cp $< s3://palewire-docs/first-pmtiles-map/ibtracs.pmtiles --acl public-read
 
 $(NAME).zip:
 	curl -L -o $@ "$(URL)"

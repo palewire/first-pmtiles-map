@@ -21,17 +21,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install build deps
-        run: sudo apt-get update && sudo apt-get install -y tippecanoe gdal-bin unzip
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
-
-      - name: Build PMTiles
-        run: make
-
-      - name: Clean up intermediate files
-        run: make clean
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

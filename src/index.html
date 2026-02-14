@@ -31,8 +31,10 @@
       maplibregl.addProtocol("pmtiles", protocol.tile);
 
       // Use a relative URL so it works on GitHub Pages subpaths
-      const stormsHttpUrl = new URL("ibtracs.pmtiles", window.location.href)
-        .href;
+      //const stormsHttpUrl = new URL("ibtracs.pmtiles", window.location.href)
+      //  .href;
+      const stormsHttpUrl =
+        "https://palewi.re/docs/first-pmtiles-map/ibtracs.pmtiles";
       const stormsTilesUrl = `pmtiles://${stormsHttpUrl}`;
       protocol.add(new pmtiles.PMTiles(stormsHttpUrl));
 
