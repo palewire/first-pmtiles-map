@@ -14,8 +14,6 @@ This class will show you how journalists use free and open-source tools to:
 
 This course is free. Anyone with access to a computer terminal is qualified. You don't need to be an expert programmer, but you will need to be comfortable using the command line and editing text files.
 
-If you've never worked with a command-line interface, consider reviewing the [Software Carpentry's shell tutorial](https://swcarpentry.github.io/shell-novice/) first.
-
 ## Table of contents
 
 ```{toctree}
