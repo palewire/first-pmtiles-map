@@ -1,161 +1,27 @@
 [build-system]
-requires = ["setuptools >= 61.0", "setuptools_scm>=8"]
-build-backend = "setuptools.build_meta"
+requires = ["setuptools >= 61.0"]
 
 [project]
-name = "your-package-name"
-dynamic = ["version"]
+name = "first-pmtiles-map"
+version = "1.0.0"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "sphinx",
+    "sphinx-autobuild",
+    "myst-parser",
+    "sphinx-palewire-theme",
+]
 authors = [{ name = "Ben Welsh", email = "b@palewi.re" }]
-description = "Your package description"
+description = "Learn how to display a massive dataset on an interactive map using PMTiles and Maplibre"
 license = { text = "MIT" }
 readme = "README.md"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: MIT License",
 ]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "setuptools-scm", "ty", "vulture"]
-test = [
-    "pytest",
-    "pytest-cov",
-    "pytest-env",
-    "pytest-ordering",
-    "pytest-randomly",
-    "pytest-rerunfailures",
-    "pytest-runner",
-    "pytest-sugar",
-    "pytest-timeout",
-    "pytest-vcr",
-    "pytest-xdist",
-    "freezegun",
-    "hypothesis",
-]
-docs = ["sphinx", "sphinx-autobuild", "myst-parser", "sphinx-palewire-theme"]
-notebooks = [
-    "jupyterlab",
-    "ipywidgets",
-    "rich",
-    "pandas",
-    "pyarrow",
-    "xlrd",
-    "openpyxl",
-    "altair",
-]
-
-[project.urls]
-Documentation = "https://palewi.re/docs/your-respository/"
-Maintainer = "https://github.com/palewire/"
-Source = "https://github.com/palewire/your-respository/"
-Issues = "https://github.com/palewire/your-respository/issues/"
-
-# [tool.setuptools]
-# packages = ["your_package_module"]
-
-[tool.setuptools_scm]
-
-[tool.ruff.lint]
-select = [
-    "E",    # pycodestyle
-    "F",    # pyflakes
-    "B",    # flake8-bugbear
-    "W",    # pycodestyle warnings
-    "I",    # isort - import sorting
-    "UP",   # pyupgrade - modern Python idioms
-    "N",    # pep8-naming - naming conventions
-    "ANN",  # flake8-annotations - type annotations
-    "YTT",  # flake8-2020 - sys.version_info checks
-    "S",    # flake8-bandit - security issues
-    "BLE",  # flake8-blind-except - blind except statements
-    "FA",   # flake8-future-annotations - future annotations
-    "ICN",  # flake8-import-conventions - import conventions
-    "PIE",  # flake8-pie - misc lints
-    "Q",    # flake8-quotes - quote consistency
-    "RSE",  # flake8-raise - raise statement improvements
-    "RET",  # flake8-return - return statement improvements
-    "SLOT", # flake8-slots - __slots__ usage
-    "SIM",  # flake8-simplify - code simplification
-    "TID",  # flake8-tidy-imports - tidy imports
-    "PTH",  # flake8-use-pathlib - pathlib usage
-    "FLY",  # flynt - f-string conversion
-    "PERF", # perflint - performance improvements
-    "RUF",  # ruff-specific rules
-]
-ignore = [
-    "E501",    # Line length
-    "F403",    # Star imports
-    "UP046",   # Generic class `Loader` uses `Generic` subclass instead of type parameters
-    "S101",    # Allow assert
-    "SIM103",  # Allow for True/False returns after a test
-    "SIM108",  # Don't force ternary expressions
-    "SIM117",  # Allow for nested with statements
-    "PERF401", # For for appending to a list
-    "RUF001",  # Allow for curly quotes
-    "RUF005",  # Allow for adding lists
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = [
-    "PLR2004",
-    "ANN",     # Annotations
-    "S105",    # Possible hardcoded password
-    "S108",    # Temp directory
-]
-
-[tool.ruff.format]
-docstring-code-format = true
-
-[tool.pytest.ini_options]
-# addopts = "--strict-markers --cov=your_package_name --cov-branch --cov-report=term-missing:skip-covered --cov-context=test --cov-fail-under=70 -n auto --timeout=60"
-testpaths = ["tests"]
-python_files = "test_*.py"
-markers = [
-    "unit: Unit tests",
-    "component: Component tests",
-    "integration: Integration tests",
-    "e2e: End-to-end tests",
-]
-filterwarnings = [
-    "ignore::DeprecationWarning:pandas.*",
-    "ignore::FutureWarning:numpy.*",
-    "ignore::DeprecationWarning:dateutil.*",
-]
-
-[tool.coverage.run]
-# source = ["your_package_module"]
-relative_files = true
-omit = ["*/__pycache__/*"]
-
-[tool.ty.environment]
-python-version = "3.13"
-
-[tool.ty.src]
-# include = ["your_package_name"]
-exclude = [
-    "tests/**",
-    "build/**",
-    ".venv/**",
-    ".github/**",
-    ".vscode/**",
-    "**/__pycache__",
-]
-
-[tool.ty.rules]
-invalid-argument-type = "warn"
-invalid-return-type = "warn"
-invalid-key = "warn"
-invalid-assignment = "warn"
-invalid-method-override = "warn"
-unresolved-attribute = "warn"
-possibly-missing-attribute = "warn"
-no-matching-overload = "ignore"
-unused-ignore-comment = "ignore"
+dev = ["pre-commit"]

@@ -1,23 +1,18 @@
 # First PMTiles Map
 
-Display a big dataset on an interactive map without a server, a database or even an API key
+Learn how to display a massive dataset on an interactive map using PMTiles and Maplibre
 
 ## What you will learn
 
-This class will walk you through the process of creating an interactive web map from a large geospatial dataset. You will do it using only free, open-source tools and a handful of static files.
+This class will show you how journalists use free and open-source tools to:
 
-It will teach you how to:
-
-- Convert a shapefile to the [PMTiles](https://github.com/protomaps/PMTiles) format using [tippecanoe](https://github.com/felt/tippecanoe)
-- Inspect a PMTiles file to understand its layers and data
+- Convert massive shapefiles to the compact [PMTiles](https://github.com/protomaps/PMTiles) format using [tippecanoe](https://github.com/felt/tippecanoe)
 - Display the tiles on an interactive map using [MapLibre GL JS](https://maplibre.org/projects/maplibre-gl-js/)
 - Create a data-driven style that colors features based on their attributes
 
-By the end, you will have a spinning globe showing the tracks of every tropical cyclone since 1980, colored by intensity. And you will understand a workflow you can apply to any large geospatial dataset.
-
 ## Who can take it
 
-This course is free. Anyone with a basic comfort level using a terminal is qualified. You don't need to be an expert programmer, but you should know how to navigate to a directory and run a command.
+This course is free. Anyone with access to a computer terminal is qualified. You don't need to be an expert programmer, but you will need to be comfortable using the command line and editing text files.
 
 If you've never worked with a command-line interface, consider reviewing the [Software Carpentry's shell tutorial](https://swcarpentry.github.io/shell-novice/) first.
 
@@ -35,4 +30,4 @@ create-map
 
 ## About this class
 
-[Ben Welsh](https://palewi.re/who-is-ben-welsh/) prepared this guide for [a training session](https://schedules.ire.org/nicar-2026/) at the National Institute for Computer-Assisted Reporting's 2026 conference. Some of the copy was written with the assistance of Anthropic's Claude, an AI-powered text generator. The materials are available as free and [open source on GitHub](https://github.com/palewire/first-pmtiles-map).
+[Ben Welsh](https://palewi.re/who-is-ben-welsh/) prepared this guide for [a training session](https://schedules.ire.org/nicar-2026/#/session/1303) at the National Institute for Computer-Assisted Reporting's 2026 conference. Some of the copy was written with the assistance of Anthropic's Claude and GitHub's Copilot. The materials are available as free and [open source on GitHub](https://github.com/palewire/first-pmtiles-map).
