@@ -30,6 +30,9 @@ jobs:
       - name: Build PMTiles
         run: make
 
+      - name: Clean up intermediate files
+        run: make clean
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

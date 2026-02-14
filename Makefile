@@ -1,7 +1,7 @@
 NAME := src/IBTrACS.since1980.list.v04r01.lines
 URL  := https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/shapefile/IBTrACS.since1980.list.v04r01.lines.zip
 
-.PHONY: all serve clean
+.PHONY: all serve clean clobber
 
 all: src/ibtracs.pmtiles
 
@@ -9,7 +9,10 @@ serve:
 	npx --yes serve --listen 8000 src
 
 clean:
-	rm -f $(NAME).* src/ibtracs.pmtiles
+	rm -f $(NAME).*
+
+clobber: clean
+	rm -f src/ibtracs.pmtiles
 
 $(NAME).zip:
 	curl -L -o $@ "$(URL)"
