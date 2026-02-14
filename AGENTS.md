@@ -14,7 +14,7 @@ This repo builds a PMTiles archive of NOAA IBTrACS tropical cyclone tracks and s
 
 - `make` builds `ibtracs.pmtiles` using the defaults in the [Makefile](Makefile): subset `since1980` and `lines` geometry.
 - `make serve` runs `npx serve` from `src/` at `http://localhost:8000` for quick preview.
-- `make clean` removes the downloaded GeoJSON and `site/`; `make clobber` also deletes the PMTiles output.
+- `make clean` removes the downloaded GeoJSON; `make clobber` also deletes the PMTiles output.
 
 ### GitHub Pages
 
