@@ -40,13 +40,7 @@ test = [
     "freezegun",
     "hypothesis",
 ]
-docs = [
-    "sphinx",
-    "sphinx-autobuild",
-    "sphinxcontrib-mermaid",
-    "myst-parser",
-    "sphinx-palewire-theme",
-]
+docs = ["sphinx", "sphinx-autobuild", "myst-parser", "sphinx-palewire-theme"]
 notebooks = [
     "jupyterlab",
     "ipywidgets",

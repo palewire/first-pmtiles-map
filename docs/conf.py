@@ -1,48 +1,50 @@
 """Configuration file for the Sphinx documentation builder."""
 
-# import os
-# import sys
 from datetime import datetime
 
-# Insert the parent directory into the path
-# sys.path.insert(0, os.path.abspath("../your_source_code"))
-
-project = "your-package-name"
-author = "your-name"
-
+project = "First PMTiles Map"
 year = datetime.now().year
-copyright = f"{year}"
+copyright = f"{year} palewire"
 
 templates_path = ["_templates"]
+html_static_path = ["_static"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+source_suffix = ".md"
+master_doc = "index"
 
+html_theme = "palewire"
 pygments_style = "sphinx"
 
-autodoc_member_order = "bysource"
-autodoc_default_options = {
-    "members": True,
-    "member-order": "bysource",
-    "special-members": "__init__",
-    "undoc-members": True,
-    "show-inheritance": True,
+html_css_files = [
+    (
+        "https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.css",
+        {"crossorigin": "anonymous"},
+    ),
+]
+
+html_js_files = [
+    (
+        "https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.js",
+        {"crossorigin": "anonymous"},
+    ),
+    ("https://unpkg.com/pmtiles@3/dist/pmtiles.js", {"crossorigin": "anonymous"}),
+]
+
+html_sidebars = {
+    "**": [
+        "about.html",
+        "navigation.html",
+    ]
+}
+html_theme_options = {
+    "canonical_url": "https://palewi.re/docs/first-pmtiles-map/",
 }
 
 extensions = [
     "myst_parser",
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
-    "sphinxcontrib.mermaid",
 ]
 
-# sphinx-palewire-theme settings
-# html_theme = "palewire"
-# html_sidebars: dict[Any, Any] = {
-#     "**": [
-#         "about.html",
-#         "navigation.html",
-#     ]
-# }
-# html_theme_options: dict[Any, Any] = {
-#     "canonical_url": "https://palewi.re/docs/first-llm-classifier/",
-# }
-# html_baseurl = "/docs/"
+myst_enable_extensions = [
+    "attrs_block",
+    "colon_fence",
+]
