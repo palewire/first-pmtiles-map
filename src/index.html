@@ -31,12 +31,7 @@
       zoom: 2,
       minZoom: 1,
       maxZoom: 10,
-      attributionControl: false,
-      hash: true
     });
-
-    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
 
     map.on('load', () => {
       map.addSource('storms', { type: 'vector', url: stormsTilesUrl });
@@ -66,10 +61,9 @@
             100, 3.5,
             150, 5
           ],
-          'line-opacity': 0.9
+          'line-opacity': 0.5
         }
       }, firstSymbolLayerId);
-
     });
   </script>
 </body>

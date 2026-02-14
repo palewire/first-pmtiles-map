@@ -6,3 +6,6 @@ venv
 uv
 __pycache__
 .pytest_cache
+pmtiles
+maplibre
+maplibregl

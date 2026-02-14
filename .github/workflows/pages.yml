@@ -27,13 +27,13 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Build site
-        run: make site
+      - name: Build PMTiles
+        run: make
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: src
 
   deploy:
     needs: build
