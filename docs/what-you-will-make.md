@@ -1,60 +1,47 @@
 # What you will make
 
-If you work through this class, you will create an interactive map of every tropical cyclone track recorded since 1980. The lines will be colored by storm intensity, from pale blue tropical depressions to deep red Category 5 hurricanes, all rendered on a dark globe that spins slowly in your browser.
+If you work through this class, you will learn how to convert a massive dataset into a lightweight static file that can be easily layered on an interactive map.
+
+Here's the demonstration case we'll work through together: Every tropical cyclone since 1980 displayed using the [MapLibre GL](https://maplibre.org/) JavaScript library.
 
 ```{raw} html
-<div class="pmtiles-map-embed">
+<div style="width: 100%; height: 466px;">
   <iframe
     src="https://palewire.github.io/first-pmtiles-map/"
     title="IBTrACS PMTiles Map"
     loading="lazy"
-    class="pmtiles-map-embed__frame"
+    style="width: 100%; height: 100%; border: 0; display: block;"
   ></iframe>
 </div>
-
-<style>
-  .pmtiles-map-embed {
-    width: 100%;
-    height: 400px;
-  }
-
-  .pmtiles-map-embed__frame {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    display: block;
-  }
-</style>
 ```
 
-The whole thing runs from just two files: a single HTML page and a single PMTiles data file. There's no tile server. No database. No API key. No ongoing costs beyond basic file hosting.
+Most maps like this are made by converting the data into a format like [GeoJSON](https://en.wikipedia.org/wiki/GeoJSON), which will pass along the full dataset to the user's browser. This works fine when you are mapping a few hundred points or lines, but quickly falls apart as the size of the dataset increases.
 
-## How is that possible?
+The problem often occurs when trying to map the detailed data sources favored by journalists, like gridded weather models, building footprints, Census tracts and ZIP Codes.
 
-The answer is [PMTiles](https://github.com/protomaps/PMTiles), a relatively new file format created by [Brandon Liu](https://bdon.org/) at [Protomaps](https://protomaps.com/). The idea is elegant: pack all the map tiles your browser needs into a single file and use [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Range_requests) to fetch only the bytes it needs on demand.
+In our case, the cyclone dataset includes more than 300,000 line segments, which would result in a GeoJSON files of more than 1 gigabyte. That's far too big for most browsers to handle.
 
-Range requests are a standard part of the web. When your browser asks for a file, it can say "just give me bytes 1,000 through 2,000" instead of downloading the whole thing. That's how video streaming works — you don't download an entire movie before watching it.
+## How do we do it?
 
-PMTiles exploits this technique to serve map tiles from a static file. When the map needs to show a particular part of the world at a particular zoom level, the PMTiles library figures out where those tile bytes live in the file, issues a range request and gets exactly the data it needs. No server-side code is involved.
+:::{figure} \_static/screenshots/what-you-will-make/protomaps.png
+:alt: The Protomaps homepage
+:width: 100%
+:::
 
-This means you can host your map on Amazon S3, GitHub Pages, Cloudflare R2 or just about any web server that supports range requests. Upload one file and your map works indefinitely. There's nothing to maintain, no servers to patch, no databases to update.
+The answer is [PMTiles](https://github.com/protomaps/PMTiles), a relatively new file format that splits the data up into tiles and packs them up into a single file. It's developed by an open-source project called [Protomaps](https://protomaps.com/).
+
+An ingenious application of [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Range_requests), the technology used to gradually stream video files, allows a PMTiles map to load instantly and run smoothly, even on mobile devices.
+
+When the map wants to show a particular part of the world at a particular zoom level, the PMTiles library figures out where those tile bytes live in the file, issues a range request and gets only the data it needs.
+
+Because all of the data in pre-processed and rolled up into a single file, there are no servers or databases to run. You can host your PMTiles file on any static hosting service that supports range requests, like [Amazon S3](https://en.wikipedia.org/wiki/Amazon_S3) or [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), and your map will work without needing to run any servers or databases. Just upload the file and you're done.
 
 ## What it takes
 
-You'll need a few open-source tools installed on your computer:
+The chapters that follow will show you how to create a PMTiles map like the one above, starting with a raw dataset and ending with a polished interactive map. We'll use only free and open-source tools, gradually building up to the final product.
 
-- [**GDAL**](https://gdal.org/en/stable/), a geospatial toolkit that includes `ogr2ogr`, a command-line utility for converting between data formats
-- [**tippecanoe**](https://github.com/felt/tippecanoe), a tool that converts GeoJSON data into vector tiles
-- [**Node.js**](https://nodejs.org/), a JavaScript runtime that we'll use to run a simple local web server
+All you'll need to start is a computer with a text editor, a command-line interface, and an internet connection to download the necessary software and data.
 
-If you're on a Mac with [Homebrew](https://brew.sh/), you can install the first two with:
-
-```bash
-brew install gdal tippecanoe
-```
-
-If you're on another system, you can find installation instructions for [GDAL](https://gdal.org/en/stable/download.html) and [tippecanoe](https://github.com/felt/tippecanoe#installation) in their documentation.
-
-You'll also want a code editor. We recommend [Visual Studio Code](https://code.visualstudio.com/), which includes a built-in terminal where you can run commands while editing files.
-
-Ready?
+:::{note}
+If you've never coded before, I recommend you start by installing [Visual Studio Code](https://code.visualstudio.com/), a free coding tool made by Microsoft, which will give you a text editor and a command-line interface to work with.
+:::
