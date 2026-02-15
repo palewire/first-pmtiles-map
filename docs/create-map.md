@@ -1,4 +1,4 @@
-# Creating your map
+# Creating the map
 
 Now it’s time to display them on a web page. We’ll use [MapLibre GL JS](https://maplibre.org/), an open-source library for rendering interactive maps in the browser.
 

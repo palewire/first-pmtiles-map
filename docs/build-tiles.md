@@ -1,4 +1,4 @@
-# Building your tiles
+# Building the tiles
 
 The first step is to convert the shapefiles into the GeoJSON format, an open standard that PMTiles makers expect as input. That's a job for `ogr2ogr`, a Swiss Army knife for working with mapping data.
 
