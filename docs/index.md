@@ -12,7 +12,9 @@ This class will show you how journalists use free and open-source tools to:
 
 ## Who can take it
 
-This course is free. Anyone with access to a computer terminal is qualified. You don't need to be an expert programmer, but you will need to be comfortable using the command line and editing text files. The documentation will assume you're working on an Apple computer, but you can follow along on Windows or Linux by researching how to install the necessary software on your operating system.
+This course is free. Anyone with access to a computer terminal is qualified. You don't need to be an expert programmer, but you will need to be comfortable using the command line and editing text files.
+
+The documentation will assume you're working on an Apple computer, but you can follow along on Windows or Linux by researching how to install the necessary software on your operating system.
 
 ## Table of contents
 
