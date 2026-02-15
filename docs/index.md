@@ -22,6 +22,7 @@ This course is free. Anyone with access to a computer terminal is qualified. You
 :numbered:
 
 what-you-will-make
+download-the-data
 build-tiles
 create-map
 ```
