@@ -40,7 +40,7 @@ You should see several files appear, including one ending in `.shp`. That's the 
 :width: 100%
 :::
 
-If you were to open them in a desktop GIS program like QGIS, you'd see the storm tracks laid out on a map.
+If you were to open them in a desktop mapping program like [QGIS](https://qgis.org/), you'd see the storm tracks laid out on a map.
 
 :::{figure} \_static/screenshots/download-the-data/qgis.png
 :alt: QGIS showing the IBTrACS shapefile
