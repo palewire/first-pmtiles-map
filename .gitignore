@@ -115,3 +115,6 @@ venv.bak/
 
 # pip and uv
 ./build/
+
+# MacOS
+.DS_Store
