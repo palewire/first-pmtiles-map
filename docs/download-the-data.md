@@ -33,7 +33,7 @@ Unzip it.
 unzip -o ibtracs.zip
 ```
 
-You should see several files appear, including one ending in `.shp`. That's the shapefile, an old but durable format for storing geographic features. It's actually a collection of files that work together — the `.shp` holds the geometry, `.dbf` holds the attributes and `.prj` holds the map projection.
+You should see several files appear, including one ending in `.shp`. That's a [shapefile](https://en.wikipedia.org/wiki/Shapefile), a digital map format developed by Esri in the 1990s that became the standard for geospatial data. It's actually a collection of files that work together — the `.shp` holds the geometry, `.dbf` holds the attributes and `.prj` holds the map projection.
 
 :::{figure} \_static/screenshots/download-the-data/finder.png
 :alt: Finder showing the IBTrACS shapefile

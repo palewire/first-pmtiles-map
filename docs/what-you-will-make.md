@@ -19,7 +19,7 @@ Most maps like this are made by converting the data into a format like [GeoJSON]
 
 The problem often occurs when trying to map the detailed data sources favored by journalists, like gridded weather models, building footprints, Census tracts and ZIP Codes.
 
-In our case, the cyclone dataset includes more than 300,000 line segments, which would result in a GeoJSON files of more than 1 gigabyte. That's far too big for most browsers to handle.
+In our case, the cyclone dataset includes more than 300,000 line segments, which would result in a GeoJSON file of nearly 1 gigabyte. That's far too big for most browsers to handle.
 
 ## How do we do it?
 
