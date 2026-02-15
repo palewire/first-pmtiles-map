@@ -1,18 +1,25 @@
 # Styling the data
 
-## Color by storm intensity
+Data layers are styled using a powerful but complex configuration syntax known as the [MapLibre Style Specification](https://maplibre.org/maplibre-style-spec/l). It can be intimidating at first, but it gives you incredible control over how your data looks on the map.
 
-White lines are fine, but the real power of vector tiles is data-driven styling. Each storm track carries its attributes from the original dataset, and we can use them to control how features are drawn.
+:::{figure} \_static/screenshots/style-the-data/spec.png
+:alt: A screenshot of the Maplibre Style Specification documentation
+:width: 100%
+:::
 
-Let's color the lines by the Saffir-Simpson Hurricane Scale category stored in the `USA_SSHS` field. Replace the `paint` block with an [`interpolate`](https://maplibre.org/maplibre-style-spec/expressions/#interpolate) expression:
+Each storm track carries its attributes from the original dataset, and we can use them to control how features are drawn.
 
-{emphasize-lines="5-18"}
+Let's color the lines by the [Saffir-Simpson Hurricane Scale](https://www.nhc.noaa.gov/aboutsshws.php) category stored in the `USA_SSHS` field. By reading the [NOAA documenatation](https://www.ncei.noaa.gov/sites/default/files/2025-09/IBTrACS_v04r01_column_documentation.pdf), we can see that the values in this field range from -5 to 5. Everything below -1 is a minor disturbance, while -1 represents tropical depressions, 0 represents tropical storms and 1-5 represent hurricane categories.
+
+We can assign a color to each category using a MapLibre style configuration. We'll do that by replacing the `paint` block with an [`interpolate`](https://maplibre.org/maplibre-style-spec/expressions/#interpolate) expression:
+
+{emphasize-lines="6-25"}
 
 ```js
 map.addLayer({
   id: "storms-line",
   type: "line",
-  source: "storms",
+  source: "ibtracs",
   "source-layer": "storms",
   paint: {
     "line-color": [
@@ -42,28 +49,34 @@ map.addLayer({
 
 Save and refresh. The storm tracks should now range from pale blue for tropical depressions to deep red for Category 5 hurricanes.
 
-Let's unpack that expression. MapLibre's style language uses a Lisp-like syntax where everything is a nested array:
-
-- **`"interpolate"`** produces a smooth, continuous output between stop values. Unlike `"step"`, which jumps between discrete values, `"interpolate"` blends smoothly.
-- **`["linear"]`** means the blending is uniform between stops.
-- **`["coalesce", ["get", "USA_SSHS"], -1]`** reads the `USA_SSHS` property from each feature. The `coalesce` wrapper provides a fallback value of -1 if the property is missing — some records in the dataset have gaps.
-- The remaining pairs are input-output stops: when `USA_SSHS` is -1, use `#7aa6c7` (pale blue); when it's 5, use `#c71f37` (deep red). Values between stops are smoothly blended.
-
-:::{tip}
-This expression syntax is shared by MapLibre, Mapbox GL and the [Maputnik](https://maputnik.github.io/) style editor. Once you learn it, you can use it across all of these tools. Maputnik is especially useful for experimenting with styles visually — you can paste in a style JSON and tweak colors, widths and expressions with a point-and-click interface.
+:::{figure} \_static/screenshots/style-the-data/color.png
+:alt: Map showing storm tracks colored by category
+:width: 100%
 :::
 
-## Vary the line width
+Let's unpack that expression.
 
-We can apply the same technique to line width using the `USA_WIND` field, which records the maximum sustained wind speed in knots. Replace the static `"line-width": 1` with another `interpolate` expression:
+The [`"interpolate"`](https://maplibre.org/maplibre-style-spec/expressions/#interpolate) directive produces a smooth, continuous output between stop values. That's unlike the alternative of [`"step"`](https://maplibre.org/maplibre-style-spec/expressions/#step), which jumps between discrete values. The `["linear"]` interpolation type instructs MapLibre to blend colors smoothly between the stops we define.
 
-{emphasize-lines="19-27"}
+The `["coalesce", ["get", "USA_SSHS"], -1]` option is telling the style which attribute to use for the interpolation. The `["get", "USA_SSHS"]` part is a lookup that asks MapLibre to pull the value of the `USA_SSHS` property from each feature. The `coalesce` wrapper provides a fallback value of -1 if the property is missing.
+
+The remaining pairs are input-output stops: when `USA_SSHS` is -1, or below, use `#7aa6c7`, when it's 5 use `#c71f37`. Values between stops are smoothly blended.
+
+:::{note}
+While the style specification is difficult for humans to read and write, it's the kind of task that large language models like ChatGPT and Claude excel at.
+
+You should learn enough of the syntax to understand how it works, but don't hesitate to use a chatbot to generate or modify style configurations for you. You can then focus on verifying that the generated style does what you want, and tweaking it as needed.
+:::
+
+We can apply the same technique to line width using the `USA_WIND` field, which records the maximum sustained wind speed in knots. Replace the static `"line-width": 1` with another `interpolate` expression that pairs wind speeds with widths:
+
+{emphasize-lines="26-38"}
 
 ```js
 map.addLayer({
   id: "storms-line",
   type: "line",
-  source: "storms",
+  source: "ibtracs",
   "source-layer": "storms",
   paint: {
     "line-color": [
@@ -103,15 +116,20 @@ map.addLayer({
 });
 ```
 
-Save and refresh. The most powerful storms will now appear as thicker lines, while weaker ones stay thin. The combination of color and width makes it easy to see where the most intense storms traveled.
+Save and refresh. The most powerful storms will now appear as thicker lines, while weaker ones stay thin.
 
-## Layer below labels
+:::{figure} \_static/screenshots/style-the-data/width.png
+:alt: Map showing storm tracks with varying line widths
+:width: 100%
+:::
 
-You may have noticed that the storm tracks draw on top of the country labels from the basemap. We can fix that by telling MapLibre to insert our layer below the first symbol (label) layer in the style.
+You may have noticed that the storm tracks draw on top of the country labels from the basemap. This is a common issue with data layers.
 
-Add a line that finds the first symbol layer, then pass its `id` as a second argument to `addLayer`:
+We can fix it by telling MapLibre to insert our storms layer below the first label layer, which MapLibre basemap's typically refer to as "symbol" layers.
 
-{emphasize-lines="1-3,34"}
+First you add a bit of code to find the ID of the first symbol layer. Then you pass that ID as the second argument to `map.addLayer()`, which tells MapLibre to insert the new layer just below it.
+
+{emphasize-lines="1-3,46-48"}
 
 ```js
 const firstSymbolLayerId = map
@@ -122,7 +140,7 @@ map.addLayer(
   {
     id: "storms-line",
     type: "line",
-    source: "storms",
+    source: "ibtracs",
     "source-layer": "storms",
     paint: {
       "line-color": [
@@ -166,232 +184,120 @@ map.addLayer(
 
 Save and refresh. The labels should now float above the storm tracks, making both easier to read.
 
-## Add the globe and spin
+:::{figure} \_static/screenshots/style-the-data/labels.png
+:alt: Map showing storm tracks with labels on top
+:width: 100%
+:::
 
-As a finishing touch, let's display the map as a 3D globe and set it spinning. MapLibre supports a globe projection that you can enable by modifying the style before creating the map.
+As a finishing touch, let's display the map as a 3D globe. MapLibre supports a globe projection that you can enable with the `setProjection` method after the map loads.
 
-Update the section where the style is loaded to set the projection, lock the zoom level and disable user interaction:
-
-{emphasize-lines="2,9-12"}
-
-```js
-        .then((style) => {
-          style.projection = { type: "globe" };
-
-          const map = new maplibregl.Map({
-            container: "map",
-            style,
-            center: [0, 15],
-            zoom: 3,
-            minZoom: 3,
-            maxZoom: 3,
-            interactive: false,
-          });
-```
-
-Then, after the `map.on("load")` block, add a globe spinner function and start it:
+{emphasize-lines="2"}
 
 ```js
-          const spinner = createGlobeSpinner(map);
-          spinner.start();
-        });
+map.on("load", () => {
+  map.setProjection({ type: "globe" });
+  // ... rest of the code
+});
 ```
 
-You'll need to define the `createGlobeSpinner` function. Add it to the top of the `<script>` block, after the PMTiles setup:
+Save and refresh. You should see your data displayed on an interactive globe that you can spin and zoom.
 
-```js
-// Globe rotation
-function createGlobeSpinner(map, degreesPerSecond = 10) {
-  let animationId = null;
-  let lastTime;
-
-  function spin() {
-    const now = performance.now();
-    const elapsed = (now - lastTime) / 1000;
-    lastTime = now;
-    const center = map.getCenter();
-    center.lng += degreesPerSecond * elapsed;
-    map.setCenter(center);
-    animationId = requestAnimationFrame(spin);
-  }
-
-  return {
-    start() {
-      if (!animationId) {
-        lastTime = performance.now();
-        spin();
-      }
-    },
-    stop() {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-      }
-    },
-  };
-}
-```
-
-Save and refresh. You should see a slowly spinning globe with storm tracks glowing across its surface. Congratulations — you've built a complete PMTiles map.
-
-## The final file
-
-Here's the complete `index.html` for reference. If something isn't working, compare your file to this one.
-
-```html
+```{raw} html
 <!doctype html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>First PMTiles Map</title>
     <script src="https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.js"></script>
-    <script src="https://unpkg.com/pmtiles@3/dist/pmtiles.js"></script>
+      <script src="https://unpkg.com/pmtiles@3/dist/pmtiles.js"></script>
     <link
       href="https://unpkg.com/maplibre-gl@5.15.0/dist/maplibre-gl.css"
       rel="stylesheet"
     />
     <style>
-      html,
       body {
         margin: 0;
-        padding: 0;
-        height: 100%;
       }
       #map {
-        position: absolute;
-        inset: 0;
+        width: 100%;
+        height: 400px;
       }
     </style>
   </head>
   <body>
     <div id="map"></div>
-    <script>
-      // Register PMTiles protocol so MapLibre can load .pmtiles files
-      const protocol = new pmtiles.Protocol();
-      maplibregl.addProtocol("pmtiles", protocol.tile);
+<script>
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol("pmtiles", protocol.tile);
+  const tilesUrl = 'https://palewi.re/docs/first-pmtiles-map/ibtracs.pmtiles';
 
-      const stormsTilesUrl = "pmtiles://http://localhost:8000/ibtracs.pmtiles";
+  const map = new maplibregl.Map({
+    container: "map",
+    style: "https://tiles.openfreemap.org/styles/fiord",
+    center: [0, 15],
+    zoom: 1.5,
+  });
 
-      // Globe rotation
-      function createGlobeSpinner(map, degreesPerSecond = 10) {
-        let animationId = null;
-        let lastTime;
+  map.on("load", () => {
+    map.setProjection({ type: "globe" });
 
-        function spin() {
-          const now = performance.now();
-          const elapsed = (now - lastTime) / 1000;
-          lastTime = now;
-          const center = map.getCenter();
-          center.lng += degreesPerSecond * elapsed;
-          map.setCenter(center);
-          animationId = requestAnimationFrame(spin);
-        }
+    map.addSource("ibtracs", {
+      type: "vector",
+      url: `pmtiles://${tilesUrl}`,
+    });
 
-        return {
-          start() {
-            if (!animationId) {
-              lastTime = performance.now();
-              spin();
-            }
-          },
-          stop() {
-            if (animationId) {
-              cancelAnimationFrame(animationId);
-              animationId = null;
-            }
-          },
-        };
-      }
+const firstSymbolLayerId = map
+  .getStyle()
+  .layers.find((layer) => layer.type === "symbol")?.id;
 
-      fetch("https://tiles.openfreemap.org/styles/fiord")
-        .then((r) => r.json())
-        .then((style) => {
-          style.projection = { type: "globe" };
+map.addLayer(
+  {
+    id: "storms-line",
+    type: "line",
+    source: "ibtracs",
+    "source-layer": "storms",
+    paint: {
+      "line-color": [
+        "interpolate",
+        ["linear"],
+        ["coalesce", ["get", "USA_SSHS"], -1],
+        -1,
+        "#7aa6c7",
+        0,
+        "#4dc9ff",
+        1,
+        "#8bc34a",
+        2,
+        "#ffd166",
+        3,
+        "#f4a261",
+        4,
+        "#e76f51",
+        5,
+        "#c71f37",
+      ],
+      "line-width": [
+        "interpolate",
+        ["linear"],
+        ["coalesce", ["get", "USA_WIND"], 0],
+        0,
+        0.8,
+        50,
+        2,
+        100,
+        3.5,
+        150,
+        5,
+      ],
+      "line-opacity": 0.5,
+    },
+  },
+  firstSymbolLayerId,
+);
 
-          const map = new maplibregl.Map({
-            container: "map",
-            style,
-            center: [0, 15],
-            zoom: 3,
-            minZoom: 3,
-            maxZoom: 3,
-            interactive: false,
-          });
 
-          map.on("load", () => {
-            map.addSource("storms", {
-              type: "vector",
-              url: stormsTilesUrl,
-            });
-
-            const firstSymbolLayerId = map
-              .getStyle()
-              .layers.find((layer) => layer.type === "symbol")?.id;
-
-            map.addLayer(
-              {
-                id: "storms-line",
-                type: "line",
-                source: "storms",
-                "source-layer": "storms",
-                paint: {
-                  "line-color": [
-                    "interpolate",
-                    ["linear"],
-                    ["coalesce", ["get", "USA_SSHS"], -1],
-                    -1,
-                    "#7aa6c7",
-                    0,
-                    "#4dc9ff",
-                    1,
-                    "#8bc34a",
-                    2,
-                    "#ffd166",
-                    3,
-                    "#f4a261",
-                    4,
-                    "#e76f51",
-                    5,
-                    "#c71f37",
-                  ],
-                  "line-width": [
-                    "interpolate",
-                    ["linear"],
-                    ["coalesce", ["get", "USA_WIND"], 0],
-                    0,
-                    0.8,
-                    50,
-                    2,
-                    100,
-                    3.5,
-                    150,
-                    5,
-                  ],
-                  "line-opacity": 0.5,
-                },
-              },
-              firstSymbolLayerId,
-            );
-          });
-
-          const spinner = createGlobeSpinner(map);
-          spinner.start();
-        });
-    </script>
+});
+</script>
   </body>
 </html>
 ```
 
-## What's next
-
-You've learned a workflow that applies to any geospatial dataset: download, convert, tile, display and style. Here are some ideas for taking it further:
-
-- **Try a different dataset.** The USGS provides real-time earthquake data as GeoJSON at [earthquake.usgs.gov](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php). You could color circles by magnitude using the same `interpolate` technique.
-- **Add interactivity.** Remove the `interactive: false` setting to let users pan and zoom. Add a [`popup`](https://maplibre.org/maplibre-gl-js/docs/API/classes/Popup/) on click to show storm names and wind speeds.
-- **Experiment with styles.** Try the [Maputnik](https://maputnik.github.io/) visual editor to tweak colors, or swap the basemap to one of OpenFreeMap's other styles like `liberty`, `bright` or `positron`.
-- **Deploy it.** Upload your `index.html` and `ibtracs.pmtiles` to GitHub Pages, Amazon S3 or any static file host and you'll have a live map with no server to maintain.
-
-```{tip}
-If you'd like to learn how to deploy a page like this to the web using [GitHub Pages](https://docs.github.com/en/pages), you might enjoy our related lesson, ["Go big with GitHub Actions."](https://palewi.re/docs/go-big-with-github-actions/deploy.html)
-```
+Congratulations. You've made your first PMTiles map. We won't cover it in this class, but you can now host applications like this on any static hosting service, as long as the PMTiles file is accessible at the URL that accepts range requests.
