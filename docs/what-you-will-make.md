@@ -34,7 +34,7 @@ An ingenious application of [HTTP range requests](https://developer.mozilla.org/
 
 When the map wants to show a particular part of the world at a particular zoom level, the PMTiles library figures out where those tile bytes live in the file, issues a range request and gets only the data it needs.
 
-Because all of the data in pre-processed and rolled up into a single file, there are no servers or databases to run. You can host your PMTiles file on any static hosting service that supports range requests, like [Amazon S3](https://en.wikipedia.org/wiki/Amazon_S3) or [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), and your map will work without needing to run any servers or databases. Just upload the file and you're done.
+Because all of the data is pre-processed and rolled up into a single file, there are no servers or databases to run. You can host your PMTiles file on any static hosting service that supports range requests, like [Amazon S3](https://en.wikipedia.org/wiki/Amazon_S3) or [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/), and your map will work without needing to run any servers or databases. Just upload the file and you're done.
 
 ## What it takes
 

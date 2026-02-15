@@ -1,6 +1,6 @@
 # Building your tiles
 
-The first step is to convert the shapefiles into the GeoJSON format, an open standard that PMTiles prefers as input. That's a job for `ogr2ogr`, a Swiss Army knife for working with mapping data.
+The first step is to convert the shapefiles into the GeoJSON format, an open standard that PMTiles makers expect as input. That's a job for `ogr2ogr`, a Swiss Army knife for working with mapping data.
 
 :::{figure} \_static/screenshots/build-tiles/ogr2ogr.png
 :alt: GDAL
@@ -64,7 +64,7 @@ You can verify it's installed with:
 tippecanoe --version
 ```
 
-The tippecanoe command to convert the GeoJSON into PMTiles is more complex. It expects you to dictate how the tiles are built by providing command-line flags, which are options that start two dashes (`--`) and are followed by a value.
+The tippecanoe command to convert the GeoJSON into PMTiles is more complex. It expects you to dictate how the tiles are built by providing command-line flags—some take values, and some are boolean switches.
 
 The most important flags for our use case are:
 
