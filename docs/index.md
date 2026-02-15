@@ -1,6 +1,6 @@
 # First PMTiles Map
 
-Learn how to display a massive dataset on an interactive map using PMTiles and Maplibre
+Learn how to display a massive dataset on an interactive map using PMTiles and MapLibre
 
 ## What you will learn
 
