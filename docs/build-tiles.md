@@ -25,24 +25,24 @@ You should see something like "GDAL 3.11.3 "Eganville", released 2025/07/12."
 Don't have Homebrew installed? Visit [brew.sh](https://brew.sh/) for instructions.
 :::
 
-Now that it's ready, we'll use `ogr2ogr` to convert the shapefile into GeoJSON format. This might take some time to complete.
+Now that it's ready, we'll use `ogr2ogr` to convert the shapefile into GeoJSON format. The first argument is the name of the output file, the second is the name of the input file. The `-f GeoJSON` flag tells it to produce GeoJSON output.
 
 ```bash
-ogr2ogr -f GeoJSON IBTrACS.since1980.list.v04r01.lines.geojson IBTrACS.since1980.list.v04r01.lines.shp
+ogr2ogr -f GeoJSON ibtracs.geojson IBTrACS.since1980.list.v04r01.lines.shp
 ```
 
-When it's done, you'll have a GeoJSON file containing every storm track as a polyline feature, with dozens of attributes attached to each one.
+This might take some time to complete. When it's done, you'll have a GeoJSON file containing every storm track as a polyline feature, with dozens of attributes attached to each one.
 
 Peek at the first few lines with:
 
 ```bash
-head -20 IBTrACS.since1980.list.v04r01.lines.geojson
+head -20 ibtracs.geojson
 ```
 
 You can see its massive size with:
 
 ```bash
-ls -lh IBTrACS.since1980.list.v04r01.lines.geojson
+ls -lh ibtracs.geojson
 ```
 
 Converting the GeoJSON into PMTiles requires another tool called [Tippecanoe](https://github.com/felt/tippecanoe), an open-source utility originally developed at [Mapbox](https://www.mapbox.com/).
@@ -93,7 +93,7 @@ tippecanoe \
     --maximum-zoom=10 \
     --no-feature-limit \
     --no-tile-size-limit \
-    IBTrACS.since1980.list.v04r01.lines.geojson
+    ibtracs.geojson
 ```
 
 The command can take a few minutes to finish and produce a file called `ibtracs.pmtiles`.
