@@ -9,7 +9,7 @@ We're going to map a dataset called [IBTrACS](https://www.ncei.noaa.gov/products
 
 The database stretches back to the 1840s and includes the path, wind speed, pressure and classification of every known tropical cyclone on Earth. We'll use the subset covering storms since 1980, which is when satellite observations became more reliable.
 
-Open a terminal `and create a new directory for your project.
+Open a terminal and create a new directory for your project.
 
 ```bash
 mkdir first-pmtiles-map

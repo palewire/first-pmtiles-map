@@ -7,7 +7,7 @@ Now it’s time to display them on a web page. We’ll use [MapLibre GL JS](http
 :width: 100%
 :::
 
-MapLibre displays maps by overlaying you data on top of a basemap that features coastlines, borders, labels and other geographic context. For our basemap, we’ll use [OpenFreeMap](https://openfreemap.org/), which provides open-source map styles with no registration or fees.
+MapLibre displays maps by overlaying your data on top of a basemap that features coastlines, borders, labels and other geographic context. For our basemap, we’ll use [OpenFreeMap](https://openfreemap.org/), which provides open-source map styles with no registration or fees.
 
 :::{figure} \_static/screenshots/create-map/openfreemap.png
 :alt: OpenFreeMap basemap
@@ -15,7 +15,7 @@ MapLibre displays maps by overlaying you data on top of a basemap that features 
 :::
 
 :::{note}
-In professional newsrooms, the basemap is often provided by a outside commercial mapping service or a custom-built internal map. If you're interested in learning how to build your own basemap, check out our companion tutorial, ["First Basemap."](https://palewi.re/docs/first-basemap/)
+In professional newsrooms, the basemap is often provided by an outside commercial mapping service or a custom-built internal map. If you're interested in learning how to build your own basemap, check out our companion tutorial, ["First Basemap."](https://palewi.re/docs/first-basemap/)
 :::
 
 Start by creating a new file called `index.html` in your project directory. Paste in this boilerplate code to display a blank basemap with OpenFreeMap's dark ["fiord"](https://github.com/openmaptiles/fiord-color-gl-style) style:
@@ -136,7 +136,7 @@ The first two highlighted lines are the key to making PMTiles work. They create 
 
 The third line constructs the URL to our `ibtracs.pmtiles` file. We use `window.location.href` to get the base URL of the current page, which ensures it will work even if we are running on a different port or hosting the page at a real URL. What you put here will ultimately depend on how you choose to host your PMTiles file.
 
-Inside the `map.on("load")` callback, we use [the standard Maplibre technique](https://maplibre.org/maplibre-gl-js/docs/examples/add-a-vector-tile-source/) to add our tiles as a data source named `"storms"`. The `url` uses the `pmtiles://` prefix, which triggers the protocol adapter.
+Inside the `map.on("load")` callback, we use [the standard Maplibre technique](https://maplibre.org/maplibre-gl-js/docs/examples/add-a-vector-tile-source/) to add our tiles as a data source named `"ibtracs"`. The `url` uses the `pmtiles://` prefix, which triggers the protocol adapter.
 
 Save and refresh your browser. The map will look exactly the same. That's because we've loaded the data but haven't told MapLibre how to draw it yet.
 
@@ -145,7 +145,7 @@ Save and refresh your browser. The map will look exactly the same. That's becaus
 :width: 100%
 :::
 
-Styling your data requires that add a layer that references the source. Add the following code inside the `map.on("load")` callback, right after `addSource`:
+Styling your data requires that you add a layer that references the source. Add the following code inside the `map.on("load")` callback, right after `addSource`:
 
 {emphasize-lines="7-17"}
 
@@ -153,7 +153,7 @@ Styling your data requires that add a layer that references the source. Add the 
 map.on("load", () => {
   map.addSource("ibtracs", {
     type: "vector",
-    url: stormsTilesUrl,
+    url: `pmtiles://${tilesUrl}`,
   });
 
   map.addLayer({
@@ -170,9 +170,9 @@ map.on("load", () => {
 });
 ```
 
-The [`addLayer`](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#addlayer) method expects a complex configuration object that links it to a source and controls how it looks on the map. In this rudimentary example, a new layer named "storms-line`is added with its data drawn from the "ibtracs" source we created in the previous step.
+The [`addLayer`](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#addlayer) method expects a complex configuration object that links it to a source and controls how it looks on the map. In this rudimentary example, a new layer named "storms-line" is added with its data drawn from the "ibtracs" source we created in the previous step.
 
-The`source-layer`property specifies which layer within the PMTiles file to use, which is necessary because a single PMTiles file can contain multiple layers. You may remember that we named our layer "storms" when we created the PMTiles file with tippecanoe, so that's what we reference here.
+The `source-layer` property specifies which layer within the PMTiles file to use, which is necessary because a single PMTiles file can contain multiple layers. You may remember that we named our layer "storms" when we created the PMTiles file with tippecanoe, so that's what we reference here.
 
 The `paint` property defines the visual style of the lines, setting them to white with a width of 1 pixel and an opacity of 0.5.
 
