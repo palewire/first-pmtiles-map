@@ -1,15 +1,15 @@
 # Styling the data
 
-Data layers are styled using a powerful but complex configuration syntax known as the [MapLibre Style Specification](https://maplibre.org/maplibre-style-spec/l). It can be intimidating at first, but it gives you incredible control over how your data looks on the map.
+Data layers are styled using a powerful but complex configuration syntax known as the [MapLibre Style Specification](https://maplibre.org/maplibre-style-spec/). It can be intimidating at first, but it gives you incredible control over how your data looks on the map.
 
 :::{figure} \_static/screenshots/style-the-data/spec.png
-:alt: A screenshot of the Maplibre Style Specification documentation
+:alt: A screenshot of the MapLibre Style Specification documentation
 :width: 100%
 :::
 
 Each storm track carries its attributes from the original dataset, and we can use them to control how features are drawn.
 
-Let's color the lines by the [Saffir-Simpson Hurricane Scale](https://www.nhc.noaa.gov/aboutsshws.php) category stored in the `USA_SSHS` field. By reading the [NOAA documenatation](https://www.ncei.noaa.gov/sites/default/files/2025-09/IBTrACS_v04r01_column_documentation.pdf), we can see that the values in this field range from -5 to 5. Everything below -1 is a minor disturbance, while -1 represents tropical depressions, 0 represents tropical storms and 1-5 represent hurricane categories.
+Let's color the lines by the [Saffir-Simpson Hurricane Scale](https://www.nhc.noaa.gov/aboutsshws.php) category stored in the `USA_SSHS` field. By reading the [NOAA documentation](https://www.ncei.noaa.gov/sites/default/files/2025-09/IBTrACS_v04r01_column_documentation.pdf), we can see that the values in this field range from -5 to 5. Everything below -1 is a minor disturbance, while -1 represents tropical depressions, 0 represents tropical storms and 1-5 represent hurricane categories.
 
 We can assign a color to each category using a MapLibre style configuration. We'll do that by replacing the `paint` block with an [`interpolate`](https://maplibre.org/maplibre-style-spec/expressions/#interpolate) expression:
 
@@ -125,7 +125,7 @@ Save and refresh. The most powerful storms will now appear as thicker lines, whi
 
 You may have noticed that the storm tracks draw on top of the country labels from the basemap. This is a common issue with data layers.
 
-We can fix it by telling MapLibre to insert our storms layer below the first label layer, which MapLibre basemap's typically refer to as "symbol" layers.
+We can fix it by telling MapLibre to insert our storms layer below the first label layer, which MapLibre basemaps typically refer to as "symbol" layers.
 
 First you add a bit of code to find the ID of the first symbol layer. Then you pass that ID as the second argument to `map.addLayer()`, which tells MapLibre to insert the new layer just below it.
 
@@ -224,78 +224,76 @@ Save and refresh. You should see your data displayed on an interactive globe tha
   </head>
   <body>
     <div id="map"></div>
-<script>
-  const protocol = new pmtiles.Protocol();
-  maplibregl.addProtocol("pmtiles", protocol.tile);
-  const tilesUrl = 'https://palewi.re/docs/first-pmtiles-map/ibtracs.pmtiles';
+    <script>
+      const protocol = new pmtiles.Protocol();
+      maplibregl.addProtocol("pmtiles", protocol.tile);
+      const tilesUrl = "https://palewi.re/docs/first-pmtiles-map/ibtracs.pmtiles";
 
-  const map = new maplibregl.Map({
-    container: "map",
-    style: "https://tiles.openfreemap.org/styles/fiord",
-    center: [0, 15],
-    zoom: 1.5,
-  });
+      const map = new maplibregl.Map({
+        container: "map",
+        style: "https://tiles.openfreemap.org/styles/fiord",
+        center: [0, 15],
+        zoom: 1.5,
+      });
 
-  map.on("load", () => {
-    map.setProjection({ type: "globe" });
+      map.on("load", () => {
+        map.setProjection({ type: "globe" });
 
-    map.addSource("ibtracs", {
-      type: "vector",
-      url: `pmtiles://${tilesUrl}`,
-    });
+        map.addSource("ibtracs", {
+          type: "vector",
+          url: `pmtiles://${tilesUrl}`,
+        });
 
-const firstSymbolLayerId = map
-  .getStyle()
-  .layers.find((layer) => layer.type === "symbol")?.id;
+        const firstSymbolLayerId = map
+          .getStyle()
+          .layers.find((layer) => layer.type === "symbol")?.id;
 
-map.addLayer(
-  {
-    id: "storms-line",
-    type: "line",
-    source: "ibtracs",
-    "source-layer": "storms",
-    paint: {
-      "line-color": [
-        "interpolate",
-        ["linear"],
-        ["coalesce", ["get", "USA_SSHS"], -1],
-        -1,
-        "#7aa6c7",
-        0,
-        "#4dc9ff",
-        1,
-        "#8bc34a",
-        2,
-        "#ffd166",
-        3,
-        "#f4a261",
-        4,
-        "#e76f51",
-        5,
-        "#c71f37",
-      ],
-      "line-width": [
-        "interpolate",
-        ["linear"],
-        ["coalesce", ["get", "USA_WIND"], 0],
-        0,
-        0.8,
-        50,
-        2,
-        100,
-        3.5,
-        150,
-        5,
-      ],
-      "line-opacity": 0.5,
-    },
-  },
-  firstSymbolLayerId,
-);
-
-
-});
-</script>
+        map.addLayer(
+          {
+            id: "storms-line",
+            type: "line",
+            source: "ibtracs",
+            "source-layer": "storms",
+            paint: {
+              "line-color": [
+                "interpolate",
+                ["linear"],
+                ["coalesce", ["get", "USA_SSHS"], -1],
+                -1,
+                "#7aa6c7",
+                0,
+                "#4dc9ff",
+                1,
+                "#8bc34a",
+                2,
+                "#ffd166",
+                3,
+                "#f4a261",
+                4,
+                "#e76f51",
+                5,
+                "#c71f37",
+              ],
+              "line-width": [
+                "interpolate",
+                ["linear"],
+                ["coalesce", ["get", "USA_WIND"], 0],
+                0,
+                0.8,
+                50,
+                2,
+                100,
+                3.5,
+                150,
+                5,
+              ],
+              "line-opacity": 0.5,
+            },
+          },
+          firstSymbolLayerId,
+        );
+      });
+    </script>
   </body>
 </html>
 ```
