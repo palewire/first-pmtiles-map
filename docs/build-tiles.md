@@ -98,6 +98,17 @@ tippecanoe \
 
 The command can take a few minutes to finish and produce a file called `ibtracs.pmtiles`.
 
+:::{note}
+If you're interested in optimizing the file size, you can experiment with different zoom levels and the `--drop-densest-as-needed` flag, which will drop features from tiles that exceed a certain size, starting with the least important features.
+
+Here is the default command recommended by the developers will automatically drop features as needed to keep tile sizes down, which can work in many situations but may not always be ideal for journalism.
+
+```bash
+tippecanoe -zg -o ibtracs.pmtiles --drop-densest-as-needed ibtracs.geojson
+```
+
+:::
+
 Before we build a map, let's verify that our PMTiles file contains what we expect. There are several ways to do this.
 
 The quickest option is the web-based viewer at [pmtiles.io](https://pmtiles.io/). Open that URL in your browser and drag your `ibtracs.pmtiles` file onto the page. You'll see a preview of the data on a map.
