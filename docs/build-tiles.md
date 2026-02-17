@@ -101,7 +101,7 @@ The command can take a few minutes to finish and produce a file called `ibtracs.
 :::{note}
 If you're interested in optimizing the file size, you can experiment with different zoom levels and the `--drop-densest-as-needed` flag, which will drop features from tiles that exceed a certain size.
 
-Here is the default command recommended by the developers will automatically drop features as needed to keep tile sizes down, which can work in many situations but may not always be ideal for journalism.
+Here is the default command recommended by tippecanoe's developers. It will automatically drop features and pre-select the zoom levels based on the density of the dataset. It will save space and speed up your map, but it may result in missing data in some circumstances.
 
 ```bash
 tippecanoe -zg -o ibtracs.pmtiles --drop-densest-as-needed ibtracs.geojson
