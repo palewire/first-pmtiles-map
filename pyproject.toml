@@ -9,7 +9,7 @@ dependencies = [
     "sphinx",
     "sphinx-autobuild",
     "myst-parser",
-    "sphinx-palewire-theme",
+    "sphinx-palewire-theme>=0.1.3",
 ]
 authors = [{ name = "Ben Welsh", email = "b@palewi.re" }]
 description = "Learn how to display a massive dataset on an interactive map using PMTiles and Maplibre"
