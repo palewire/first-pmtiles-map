@@ -7,7 +7,7 @@ Learn how to display a massive dataset on an interactive map using PMTiles and M
 This class will show you how journalists use free and open-source tools to:
 
 - Convert massive shapefiles to the compact [PMTiles](https://github.com/protomaps/PMTiles) format using [tippecanoe](https://github.com/felt/tippecanoe)
-- Display the tiles on an interactive map using [MapLibre GL JS](https://maplibre.org/projects/maplibre-gl-js/)
+- Display the tiles on an interactive map using [MapLibre GL JS](https://maplibre.org/)
 - Create a data-driven style that colors features based on their attributes
 
 ## Who can take it
